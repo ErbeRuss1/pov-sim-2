@@ -28,5 +28,14 @@ ADD --chmod=644 https://github.com/open-telemetry/opentelemetry-java-instrumenta
 # set up javaagent
 ENV JAVA_TOOL_OPTIONS=-javaagent:/app/opentelemetry-javaagent.jar
 
+# pyroscope changes
+
+# Copy the pyroscope JAR file
+COPY --from=build /app/instrumentation/pyroscope.jar pyroscope.jar
+
+# set up javaagent, now 2 of them
+ENV JAVA_TOOL_OPTIONS='-javaagent:/app/opentelemetry-javaagent.jar -javaagent:/app/pyroscope.jar'
+
 # Set the command to run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
