@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Flights.css";
 
@@ -10,6 +10,10 @@ function Flights() {
   const [error, setError] = useState(null);
   const [shouldRaise, setShouldRaise] = useState(false);
 
+  useEffect(() => {
+    console.log("[Flights] Component mounted");
+  }, []);
+
   const makeRequest = async (airline) => {
     const apiUrl = FLIGHTS_API_URL + `/${airline}` + (shouldRaise ? "?raise=500" : "");
     try {
@@ -20,7 +24,7 @@ function Flights() {
       setError(error.message);
       setData(null);
     }
-  }
+  };
 
   return (
     <div className="flights">

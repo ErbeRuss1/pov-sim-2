@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Airlines.css";
 
@@ -9,15 +9,22 @@ function Airlines() {
   const [error, setError] = useState(null);
   const [shouldRaise, setShouldRaise] = useState(false);
 
+  useEffect(() => {
+    console.log("[Airlines] Page mounted");
+  }, []);
+
   const makeRequest = async () => {
     const apiUrl = shouldRaise ? `${AIRLINES_API_URL}?raise=true` : AIRLINES_API_URL;
+    console.log("[Airlines] Making request to:", apiUrl);
     try {
       const response = await axios.get(apiUrl);
       setData(response.data);
       setError(null);
+      console.log("[Airlines] Success:", response.status);
     } catch (error) {
       setError(error.message);
       setData(null);
+      console.error("[Airlines] Error:", error.message);
     }
   }
 

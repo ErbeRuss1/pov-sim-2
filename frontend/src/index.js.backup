@@ -1,0 +1,60 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+import { matchRoutes, createRoutesFromChildren, Routes, useLocation, useNavigationType } from 'react-router-dom';
+import { initializeFaro, createReactRouterV6DataOptions, ReactIntegration, getWebInstrumentations, } from '@grafana/faro-react';   // , ReactRouterVersion
+import { TracingInstrumentation } from '@grafana/faro-web-tracing';
+
+// Initialize Faro only if collector URL is provided
+const faroCollectorUrl = process.env.REACT_APP_FARO_COLLECTOR_URL;
+if (faroCollectorUrl) {
+  try {
+    initializeFaro({
+      url: faroCollectorUrl,
+      app: {
+        name: 'POV-SIM_2_Folly_demo',
+        version: '1.0.0',
+        environment: process.env.REACT_APP_ENVIRONMENT || 'development'
+      },
+      
+      instrumentations: [
+        // Mandatory, omits default instrumentations otherwise.
+        ...getWebInstrumentations(),
+
+        // Tracing package to get end-to-end visibility for HTTP requests.
+        new TracingInstrumentation(),
+
+        // React integration for React applications.
+        new ReactIntegration({
+          router: createReactRouterV6DataOptions({
+            createRoutesFromChildren,
+            matchRoutes,
+            Routes,
+            useLocation,
+            useNavigationType,
+          }),
+        }),
+      ],
+    });
+  } catch (error) {
+    console.warn('Failed to initialize Faro:', error);
+  }
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();

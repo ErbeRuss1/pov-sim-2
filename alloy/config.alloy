@@ -9,8 +9,6 @@ logging {
 //  enabled = true
 //}
 
-
-
 // The rest of this content is mostly identical to:
 //
 // https://grafana.com/docs/opentelemetry/collector/grafana-alloy/#advanced-manual-setup
