@@ -46,9 +46,28 @@ otelcol.processor.resourcedetection "default" {
 
 	output {
 		metrics = [otelcol.processor.transform.drop_unneeded_resource_attributes.input]
-		logs    = [otelcol.processor.transform.drop_unneeded_resource_attributes.input]
+		logs    = [otelcol.processor.transform.add_custom_log_labels.input]
 		traces  = [otelcol.processor.transform.drop_unneeded_resource_attributes.input]
 	}
+}
+
+otelcol.processor.transform "add_custom_log_labels" {
+  error_mode = "ignore"
+  log_statements {
+    context    = "log"
+    statements = [
+      // Write onto resource so Loki indexes as labels
+      "set(resource.attributes[\"exporter\"], \"OTLP\")",
+      "set(resource.attributes[\"job\"], resource.attributes[\"service.name\"])",
+      // Tell Loki which resource attrs to promote as labels
+      "set(attributes[\"loki.resource.labels\"], \"exporter,job,service.name,service.instance.id\")",
+      "set(attributes[\"region\"], \"us-west\")",
+      "set(attributes[\"assigned_oa\"], \"russerbe\")",
+    ]
+  }
+  output {
+    logs    = [otelcol.processor.transform.drop_unneeded_resource_attributes.input]
+  }
 }
 
 otelcol.processor.transform "drop_unneeded_resource_attributes" {
